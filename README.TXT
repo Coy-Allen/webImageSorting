@@ -12,7 +12,8 @@ setup apache, php, and mysql
 webroot should be at htdocs folder (aka you shouldnt be able to access this file via web interface)
 create mysql database with these tables:
 	images ((bin*64) sha512, (bin*16) md5, (unsigned-tinyint) state, (unsigned-int) popularity, (string) local_location, (string) external_location)
-make the serviceConfig.php file
+make the serviceConfig.php file and fill in the correct info
+make the htdocs/images folder and immediate subfolders
 recomended permisions (run in same folder as serviceConfig.php and README.txt)
 umask 0027				;makes all new files rw-r-----
 chmod -R 640 *				;owner has full perms while web server has read
