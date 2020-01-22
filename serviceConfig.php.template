@@ -1,0 +1,17 @@
+<?php
+$imageLocation = array(
+	"images" => $_SERVER['DOCUMENT_ROOT']."/images/",
+	"upload" => $_SERVER['DOCUMENT_ROOT']."/images/upload/",
+	"thumbs" => $_SERVER['DOCUMENT_ROOT']."/thumbs/",
+	"dump" => $_SERVER['DOCUMENT_ROOT']."/images/dump/",
+	"unsorted" => $_SERVER['DOCUMENT_ROOT']."/images/unsorted/",
+	"sorted" => $_SERVER['DOCUMENT_ROOT']."/images/sorted/",
+);
+$dbConfig = array(
+	"host" => "127.0.0.1",
+	"username" => "imageSorterUser",
+	"password" => "password1",
+	"dbname" => "imageServerDatabase",
+	"tbname" => "imagesTable",
+);
+?>

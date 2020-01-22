@@ -1,0 +1,49 @@
+html, body{
+	margin:0px;
+}
+
+#pictureHolder {
+	width: calc(100% - 20px);
+	background-color: #4B6858;
+	text-align: center;
+	padding: 10px;
+}
+.pictureControls {
+	background-color: #4D4730;
+	height: 30px;
+	padding: 10px;
+	font-size: 20px;
+	text-align: center;
+}
+.currentPicNumber {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+.pictureControls button {
+	font-size: 20px;
+}
+.pictureFrame {
+	width: 250px;
+	height: 273px;
+	margin: 5px;
+	background-color: #46ACC2;
+	display: inline-block;
+	vertical-align: top;
+	overflow: hidden;
+}
+.pictureLink:link {color:black;}
+.pictureLink:visited {color:black;}
+.pictureLink:hover {color:black;}
+.pictureLink:active {color:grey;}
+.pictureName {
+	display: block;
+	width: 250px;
+	word-wrap: break-word;
+	font-family: monospace;
+}
+.picture {
+	background-color: #46ACC2;
+	max-width: 250px;
+	max-height: 250px;
+	margin-bottom: -2px;
+}

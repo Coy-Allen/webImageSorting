@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>upload zip</title>
+	<script defer async src="js/upload.js"></script>
+	<link rel="stylesheet" type="text/css" href="/style/upload.css">
+</head>
+<body>
+	<form action "backend/upload.php" method="post" enctype="multipart/form-data">
+		Select zip to upload:
+		<input type="file" name="file" id="file">
+		<input type="submit" value="Upload" name="submit">
+	</form>
+</body>
+</html>

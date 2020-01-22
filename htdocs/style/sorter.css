@@ -1,0 +1,39 @@
+html{
+	min-height:100%;
+}
+body{
+	margin:0px;
+	height:100%;
+}
+/* default css */
+.selections{
+	position:fixed;
+	width:200px;
+	height:200px;
+	background-color:rgba(222,184,135,0.5);
+}
+.selectionsText{
+	position:absolute;
+	width:200px;
+	height:20px;
+	text-align:center;
+	white-space:nowrap;
+}
+.top{top:0px;}
+.left{left:0px;}
+.right{right:0px;}
+.bottom{bottom:0px;}
+.top.selections{left:calc(50% - 100px);}
+.left.selections{top:calc(50% - 100px);}
+.right.selections{top:calc(50% - 100px);}
+.bottom.selections{left:calc(50% - 100px);}
+.top.selectionsText{left:calc(50% - 100px);text-align:center;}
+.left.selectionsText{top:calc(50% - 20px);text-align:left;}
+.right.selectionsText{top:calc(50% - 0px);text-align:right;}
+.bottom.selectionsText{left:calc(50% - 100px);text-align:center;}
+/* tmp css to show target operation */
+.selections:hover{width:300px;height:300px;}
+.top.selections:hover{left:calc(50% - 150px);}
+.left.selections:hover{top:calc(50% - 150px);}
+.right.selections:hover{top:calc(50% - 150px);}
+.bottom.selections:hover{left:calc(50% - 150px);}
