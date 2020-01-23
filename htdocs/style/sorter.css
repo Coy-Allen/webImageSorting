@@ -1,3 +1,4 @@
+/*main tags*/
 html{
 	min-height:100%;
 }
@@ -5,11 +6,12 @@ body{
 	margin:0px;
 	height:100%;
 }
-/* default css */
+
+/*selection and selectionText*/
 .selections{
 	position:fixed;
 	width:200px;
-	height:200px;
+	height:100px;
 	background-color:rgba(222,184,135,0.5);
 }
 .selectionsText{
@@ -24,16 +26,33 @@ body{
 .right{right:0px;}
 .bottom{bottom:0px;}
 .top.selections{left:calc(50% - 100px);}
-.left.selections{top:calc(50% - 100px);}
-.right.selections{top:calc(50% - 100px);}
+.left.selections{top:calc(50% - 50px);}
+.right.selections{top:calc(50% - 50px);}
 .bottom.selections{left:calc(50% - 100px);}
 .top.selectionsText{left:calc(50% - 100px);text-align:center;}
 .left.selectionsText{top:calc(50% - 20px);text-align:left;}
 .right.selectionsText{top:calc(50% - 0px);text-align:right;}
 .bottom.selectionsText{left:calc(50% - 100px);text-align:center;}
-/* tmp css to show target operation */
-.selections:hover{width:300px;height:300px;}
-.top.selections:hover{left:calc(50% - 150px);}
-.left.selections:hover{top:calc(50% - 150px);}
-.right.selections:hover{top:calc(50% - 150px);}
-.bottom.selections:hover{left:calc(50% - 150px);}
+
+/*control menu*/
+.controlMenu{
+	position:absolute;
+	width:200px;
+	left:calc(50% - 100px);
+	top:calc(50% - 100px);
+	border:solid 1px black;
+}
+.controlMenuTitle{
+	height:20px;
+	padding-left:5px;
+	line-height:20px;
+	background-color:grey;
+}
+.controlMenuItem{
+	height:20px;
+	padding-left:5px;
+	line-height:20px;
+	border-top: solid 1px grey;
+}
+.controlMenuItem:hover{
+	background-color:lightGrey;

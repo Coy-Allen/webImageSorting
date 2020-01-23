@@ -6,29 +6,81 @@
 	<script src="/js/sorter.js" type="text/javascript" charset="utf-8" defer></script>
 </head>
 <body>
+	<!--TODO make the controlMenu clickable-->
+	<div hidden id="sortControlMenu" class="controlMenu">
+		<div class="controlMenuTitle">
+			Sorting Control
+		</div>
+		<div class="controlMenuItem">
+			0. cancel
+		</div>
+		<div class="controlMenuItem">
+			1. skip file
+		</div>
+		<div class="controlMenuItem">
+			2. finish file
+		</div>
+	</div>
+	<div hidden id="folderControlMenu" class="controlMenu">
+		<div class="controlMenuTitle">
+			Folder Control
+		</div>
+		<div class="controlMenuItem">
+			0. cancel
+		</div>
+		<div class="controlMenuItem">
+			1. create folder
+		</div>
+		<div class="controlMenuItem">
+			2. rename folder
+		</div>
+		<div class="controlMenuItem">
+			3. delete folder
+		</div>
+	</div>
+	<div hidden id="fileControlMenu" class="controlMenu">
+		<div class="controlMenuTitle">
+			File Control
+		</div>
+		<div class="controlMenuItem">
+			0. cancel
+		</div>
+		<div class="controlMenuItem">
+			1. rename file
+		</div>
+		<div class="controlMenuItem">
+			2. set external source
+		</div>
+		<div class="controlMenuItem">
+			3. delete file
+		</div>
+		<div class="controlMenuItem">
+			4. blacklist file
+		</div>
+	</div>
 	<div id="topMainSelection" class="top selections">
-		<div id="topTopText" class="top selectionsText">TTT</div>
-		<div id="topLeftText" class="left selectionsText">TLT</div>
-		<div id="topRightText" class="right selectionsText">TRT</div>
-		<div id="topBottomText" class="bottom selectionsText">TBT</div>
+		<div id="selectionText0" class="top selectionsText">cancel</div>
+		<div id="selectionText1" class="left selectionsText"></div>
+		<div id="selectionText2" class="right selectionsText"></div>
+		<div id="selectionText3" class="bottom selectionsText"></div>
 	</div>
 	<div id="leftMainSelection" class="left selections">
-		<div id="leftTopText" class="top selectionsText">LTT</div>
-		<div id="leftLeftText" class="left selectionsText">LLT</div>
-		<div id="leftRightText" class="right selectionsText">LRT</div>
-		<div id="leftBottomText" class="bottom selectionsText">LBT</div>
+		<div id="selectionText4" class="top selectionsText"></div>
+		<div id="selectionText5" class="left selectionsText">cancel</div>
+		<div id="selectionText6" class="right selectionsText"></div>
+		<div id="selectionText7" class="bottom selectionsText"></div>
 	</div>
 	<div id="rightMainSelection" class="right selections">
-		<div id="rightTopText" class="top selectionsText">RTT</div>
-		<div id="rightLeftText" class="left selectionsText">RLT</div>
-		<div id="rightRightText" class="right selectionsText">RRT</div>
-		<div id="rightBottomText" class="bottom selectionsText">RBT</div>
+		<div id="selectionText8" class="top selectionsText"></div>
+		<div id="selectionText9" class="left selectionsText"></div>
+		<div id="selectionText10" class="right selectionsText">cancel</div>
+		<div id="selectionText11" class="bottom selectionsText"></div>
 	</div>
 	<div id="bottomMainSelection" class="bottom selections">
-		<div id="bottomTopText" class="top selectionsText">BTT BTT BTT</div>
-		<div id="bottomLeftText" class="left selectionsText">BLT BLT BLT</div>
-		<div id="bottomRightText" class="right selectionsText">BRT BRT BRT</div>
-		<div id="bottomBottomText" class="bottom selectionsText">BBT BBT BBT</div>
+		<div id="selectionText12" class="top selectionsText">sorting control</div>
+		<div id="selectionText13" class="left selectionsText">folder control</div>
+		<div id="selectionText14" class="right selectionsText">file control</div>
+		<div id="selectionText15" class="bottom selectionsText">cancel</div>
 	</div>
 	<div id="viewer">INSERT IMAGE HERE</div>
 </body>
