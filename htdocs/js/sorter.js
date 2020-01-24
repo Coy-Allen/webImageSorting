@@ -123,56 +123,25 @@ function selectionController(keyCode){
 	}
 }
 
+
+
 function selectedAction(selectionNumber){
-	//TODO shorten this somehow
-	switch(selectionNumber){
+	if(selectionNumber % 5 == 0){
 		//0,5,10,15 are deselects and dont do anything so they are not listed
-		//case  0:
-		case  1:
-			moveImageToFolder(0);
-			break;
-		case  2:
-			moveImageToFolder(1);
-			break;
-		case  3:
-			moveImageToFolder(2);
-			break;
-		case  4:
-			moveImageToFolder(3);
-			break;
-		//case  5:
-		case  6:
-			moveImageToFolder(4);
-			break;
-		case  7:
-			moveImageToFolder(5);
-			break;
-		case  8:
-			moveImageToFolder(6);
-			break;
-		case  9:
-			moveImageToFolder(7);
-			break;
-		//case 10:
-		case 11:
-			moveImageToFolder(8);
-			break;
-		case 12:
-			//sortControlMenu
-			sortControlMenu.hidden = false;
-			selectedControlMenu = sortControlMenu;
-			break;
-		case 13:
-			//folderControlMenu
-			folderControlMenu.hidden = false;
-			selectedControlMenu = folderControlMenu;
-			break;
-		case 14:
-			//fileControlMenu
-			fileControlMenu.hidden = false;
-			selectedControlMenu = fileControlMenu;
-			break;
-		//case 15:
+	}else if(selectionNumber < 12){
+		moveImageToFolder(selectionNumber-1-Math.floor(selectionNumber/5));
+	}else if(selectionNumber == 12){
+		//sortControlMenu
+		sortControlMenu.hidden = false;
+		selectedControlMenu = sortControlMenu;
+	}else if(selectionNumber == 13){
+		//folderControlMenu
+		folderControlMenu.hidden = false;
+		selectedControlMenu = folderControlMenu;
+	}else if(selectionNumber == 14){
+		//fileControlMenu
+		fileControlMenu.hidden = false;
+		selectedControlMenu = fileControlMenu;
 	}
 }
 
@@ -189,6 +158,10 @@ function controlMenuAction(itemNumber){
 				break;
 			case 2:
 				sortingFinishFile();
+				closeMenu = true;
+				break;
+			case 3:
+				sortingRequest();
 				closeMenu = true;
 				break;
 		}
@@ -269,6 +242,9 @@ function sortingFinishFile(){
 	//TODO
 }
 function sortingSkipFile(){
+	//TODO
+}
+function sortingRequest(){
 	//TODO
 }
 function folderCreate(){
