@@ -1,14 +1,11 @@
-//////////////////////
-//keycapture and gui//
-//////////////////////
+///////////////////////////
+//keycapture and base gui//
+///////////////////////////
 var topMainSelection = document.getElementById("topMainSelection");
 var leftMainSelection = document.getElementById("leftMainSelection");
 var rightMainSelection = document.getElementById("rightMainSelection");
 var bottomMainSelection = document.getElementById("bottomMainSelection");
 var selectedSelection = null;
-var sortControlMenu = document.getElementById("sortControlMenu");
-var folderControlMenu = document.getElementById("folderControlMenu");
-var fileControlMenu = document.getElementById("fileControlMenu");
 var selectedControlMenu = null;
 
 window.onkeypress = function(event) {
@@ -37,7 +34,7 @@ window.onkeypress = function(event) {
 		if(event.keyCode >= 48 && event.keyCode <= 57){
 			//0=48,1=49,...,9=57
 			//this translates the keycode back to the number on the keyboard
-			controlMenuAction(event.keyCode-48);
+			selectedControlMenu.selectAction(event.keyCode-48);
 		}
 	}else if(event.keyCode == 119 || event.keyCode == 97 || event.keyCode == 100 || event.keyCode == 115){
 		//w=119 a=97 d=100 s=115
@@ -123,86 +120,13 @@ function selectionController(keyCode){
 	}
 }
 
-
-
 function selectedAction(selectionNumber){
 	if(selectionNumber % 5 == 0){
 		//0,5,10,15 are deselects and dont do anything so they are not listed
 	}else if(selectionNumber < 12){
 		moveImageToFolder(selectionNumber-1-Math.floor(selectionNumber/5));
-	}else if(selectionNumber == 12){
-		//sortControlMenu
-		sortControlMenu.hidden = false;
-		selectedControlMenu = sortControlMenu;
-	}else if(selectionNumber == 13){
-		//folderControlMenu
-		folderControlMenu.hidden = false;
-		selectedControlMenu = folderControlMenu;
-	}else if(selectionNumber == 14){
-		//fileControlMenu
-		fileControlMenu.hidden = false;
-		selectedControlMenu = fileControlMenu;
-	}
-}
-
-function controlMenuAction(itemNumber){
-	//TODO shorten this somehow
-	var closeMenu = false;
-	if(itemNumber == 0){
-		closeMenu = true;
-	}else if(selectedControlMenu == sortControlMenu){
-		switch(itemNumber){
-			case 1:
-				sortingSkipFile()
-				closeMenu = true;
-				break;
-			case 2:
-				sortingFinishFile();
-				closeMenu = true;
-				break;
-			case 3:
-				sortingRequest();
-				closeMenu = true;
-				break;
-		}
-	}else if(selectedControlMenu == folderControlMenu){
-		switch(itemNumber){
-			case 1:
-				folderCreate();
-				closeMenu = true;
-				break;
-			case 2:
-				folderRename();
-				closeMenu = true;
-				break;
-			case 3:
-				folderDelete();
-				closeMenu = true;
-				break;
-		}
-	}else if(selectedControlMenu == fileControlMenu){
-		switch(itemNumber){
-			case 1:
-				fileRename();
-				closeMenu = true;
-				break;
-			case 2:
-				fileSetExternalSource();
-				closeMenu = true;
-				break;
-			case 3:
-				fileDelete();
-				closeMenu = true;
-				break;
-			case 4:
-				fileBlacklist();
-				closeMenu = true;
-				break;
-		}
-	}
-	if(closeMenu){
-		selectedControlMenu.hidden = true;
-		selectedControlMenu = null;
+	}else{
+		controlMenuActivate(selectionNumber-12);
 	}
 }
 
@@ -227,6 +151,70 @@ function updateFolders(folderList){
 		}
 		document.getElementById("selectionText"+(i+idOffset)).innerHTML = name;
 	}
+}
+////////////////////
+//menus and popups//
+////////////////////
+class controlMenu {
+	constructor(variableName,title,itemNames,itemFunctions){
+		//for some reason it only lets me do this here
+		this.selectAction = function(actionNumber){
+			if(actionNumber >= this.itemFunctions.length) return;
+			console.log(actionNumber);
+			this.itemFunctions[actionNumber]();
+			this.controlMenuDiv.hidden = true;
+			selectedControlMenu = null;
+		};
+		if(itemNames.length != itemFunctions.length) console.error("controlMenu: names and functions not in 1:1 pairs");
+		this.itemFunctions = itemFunctions;
+		//create main div and start it hidden
+		this.controlMenuDiv = document.createElement("div");
+		this.controlMenuDiv.className = "controlMenu";
+		this.controlMenuDiv.hidden = true;
+		selectedControlMenu = null;
+		//create and append title
+		var controlMenuTitle = document.createElement("div");
+		controlMenuTitle.className = "controlMenuTitle";
+		controlMenuTitle.appendChild(document.createTextNode(title));
+		this.controlMenuDiv.appendChild(controlMenuTitle);
+		//create and append each item
+		for(var i=0;i<itemNames.length;i++){
+			var item = document.createElement("div");
+			item.className = "controlMenuItem";
+			//"i" wont stick to whatever it is when calling onclick so we need to store it somewhere
+			item.setAttribute("data-actionnumber",i);
+			//no way to get this.selectAction into this context so we need the variableName our object belongs too
+			item.setAttribute("onclick",variableName+".selectAction(this.getAttribute(\"data-actionnumber\"))");
+			item.appendChild(document.createTextNode(""+i+". "+itemNames[i]));
+			this.controlMenuDiv.appendChild(item);
+		}
+		document.body.prepend(this.controlMenuDiv);
+	}
+}
+//function.prototype is used as a noop for the cancel item
+var sortControlMenu = new controlMenu("sortControlMenu","Sorting Control",
+	["cancel","skip file","finish file","request new batch"],
+	[Function.prototype,sortingSkipFile,sortingFinishFile,sortingRequest]);
+var folderControlMenu = new controlMenu("folderControlMenu","Folder Control",
+	["cancel","create folder","rename folder","delete folder"],
+	[Function.prototype,folderCreate,folderRename,folderDelete]);
+var fileControlMenu = new controlMenu("fileControlMenu","File Control",
+	["cancel","rename file","set external source","delete file","blacklist file"],
+	[Function.prototype,fileRename,fileSetExternalSource,fileDelete,fileBlacklist]);
+
+function controlMenuActivate(controlMenuNumber){
+	switch(controlMenuNumber){
+		case 0:
+			selectedControlMenu = sortControlMenu;
+			break;
+		case 1:
+			selectedControlMenu = folderControlMenu;
+			break;
+		case 2:
+			selectedControlMenu = fileControlMenu;
+			break;
+	}
+	selectedControlMenu.controlMenuDiv.hidden = false;
 }
 ////////////////////////////////
 //data and backend interaction//
