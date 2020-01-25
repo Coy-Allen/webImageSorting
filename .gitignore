@@ -1,3 +1,4 @@
 htdocs/.storage
 htdocs/images
 serviceConfig.php
+*.swp
