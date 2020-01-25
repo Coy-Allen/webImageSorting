@@ -6,39 +6,27 @@ var leftMainSelection = document.getElementById("leftMainSelection");
 var rightMainSelection = document.getElementById("rightMainSelection");
 var bottomMainSelection = document.getElementById("bottomMainSelection");
 var selectedSelection = null;
-var selectedControlMenu = null;
+var keyCaptureStack = [];
 
 window.onkeypress = function(event) {
-	/*
-	 * keys:
-	 * wasd = folder controls
-	 *
-	 * actions (selctedAction):
-	 * 1,2,3,4,6,7,8,9,11 folders
-	 * 0,5,10,15 deselect selection
-	 * 12 sort control (new menu)
-	 *   skip file
-	 *   finish file
-	 * 13 folder control (new menu)
-	 *   create folder
-	 *   rename folder
-	 *   delete folder
-	 * 14 file control (new menu)
-	 *   rename file
-	 *   set external source
-	 *   delete file
-	 *   blacklist file
-	 */
-	//TODO help section via 'h' key
-	if(selectedControlMenu != null){
-		if(event.keyCode >= 48 && event.keyCode <= 57){
-			//0=48,1=49,...,9=57
-			//this translates the keycode back to the number on the keyboard
-			selectedControlMenu.selectAction(event.keyCode-48);
-		}
-	}else if(event.keyCode == 119 || event.keyCode == 97 || event.keyCode == 100 || event.keyCode == 115){
-		//w=119 a=97 d=100 s=115
-		selectionController(event.keyCode);
+	// keyCaptureStack's last element tells us what gui we should use for keypresses.
+	switch(keyCaptureStack[keyCaptureStack.length-1]){
+		case "help":
+			break;
+		case "controlMenu":
+			if(event.keyCode >= 48 && event.keyCode <= 57){
+				//0=48 1=49 ... 9=57
+				//this translates the keycode back to the number on the keyboard
+				selectedControlMenu.selectAction(event.keyCode-48);
+			}
+			break;
+		case undefined:
+			//array is empty (only base gui is up)
+			if(event.keyCode == 119 || event.keyCode == 97 || event.keyCode == 100 || event.keyCode == 115){
+				//w=119 a=97 d=100 s=115
+				selectionController(event.keyCode);
+			}
+			break;
 	}
 }
 
@@ -162,8 +150,10 @@ class controlMenu {
 			if(actionNumber >= this.itemFunctions.length) return;
 			console.log(actionNumber);
 			this.itemFunctions[actionNumber]();
+			//hide and deselect menu then stop capturing keypresses
 			this.controlMenuDiv.hidden = true;
 			selectedControlMenu = null;
+			keyCaptureStack.pop();
 		};
 		if(itemNames.length != itemFunctions.length) console.error("controlMenu: names and functions not in 1:1 pairs");
 		this.itemFunctions = itemFunctions;
@@ -171,7 +161,6 @@ class controlMenu {
 		this.controlMenuDiv = document.createElement("div");
 		this.controlMenuDiv.className = "controlMenu";
 		this.controlMenuDiv.hidden = true;
-		selectedControlMenu = null;
 		//create and append title
 		var controlMenuTitle = document.createElement("div");
 		controlMenuTitle.className = "controlMenuTitle";
@@ -201,6 +190,7 @@ var folderControlMenu = new controlMenu("folderControlMenu","Folder Control",
 var fileControlMenu = new controlMenu("fileControlMenu","File Control",
 	["cancel","rename file","set external source","delete file","blacklist file"],
 	[Function.prototype,fileRename,fileSetExternalSource,fileDelete,fileBlacklist]);
+var selectedControlMenu = null;
 
 function controlMenuActivate(controlMenuNumber){
 	switch(controlMenuNumber){
@@ -215,6 +205,7 @@ function controlMenuActivate(controlMenuNumber){
 			break;
 	}
 	selectedControlMenu.controlMenuDiv.hidden = false;
+	keyCaptureStack.push("controlMenu");
 }
 ////////////////////////////////
 //data and backend interaction//
