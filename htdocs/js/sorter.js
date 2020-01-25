@@ -12,19 +12,24 @@ window.onkeypress = function(event) {
 	// keyCaptureStack's last element tells us what gui we should use for keypresses.
 	switch(keyCaptureStack[keyCaptureStack.length-1]){
 		case "help":
+			if(event.key == "Escape"){
+				//STUB
+			}
 			break;
 		case "controlMenu":
-			if(event.keyCode >= 48 && event.keyCode <= 57){
-				//0=48 1=49 ... 9=57
-				//this translates the keycode back to the number on the keyboard
-				selectedControlMenu.selectAction(event.keyCode-48);
+			if("0123456789".includes(event.key)){
+				//key is a number 0-9
+				selectedControlMenu.selectAction(event.key);
+			}else if("?h".includes(event.key)){
+				//STUB
 			}
 			break;
 		case undefined:
 			//array is empty (only base gui is up)
-			if(event.keyCode == 119 || event.keyCode == 97 || event.keyCode == 100 || event.keyCode == 115){
-				//w=119 a=97 d=100 s=115
+			if("wads".includes(event.key)){
 				selectionController(event.keyCode);
+			}else if("?h".includes(event.key)){
+				//STUB
 			}
 			break;
 	}
@@ -119,7 +124,7 @@ function selectedAction(selectionNumber){
 }
 
 function updateImage(){
-	//TODO
+	//STUB
 }
 
 function updateFolders(folderList){
@@ -215,35 +220,35 @@ var nextRequest;
 
 
 function moveImageToFolder(folderNumber){
-	//TODO
+	//STUB
 }
 function sortingFinishFile(){
-	//TODO
+	//STUB
 }
 function sortingSkipFile(){
-	//TODO
+	//STUB
 }
 function sortingRequest(){
-	//TODO
+	//STUB
 }
 function folderCreate(){
-	//TODO
+	//STUB
 }
 function folderRename(){
-	//TODO
+	//STUB
 }
 function folderDelete(){
-	//TODO
+	//STUB
 }
 function fileRename(){
-	//TODO
+	//STUB
 }
 function fileSetExternalSource(){
-	//TODO
+	//STUB
 }
 function fileDelete(){
-	//TODO
+	//STUB
 }
 function fileBlacklist(){
-	//TODO
+	//STUB
 }
