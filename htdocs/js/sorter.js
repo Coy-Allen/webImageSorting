@@ -30,7 +30,7 @@ window.onkeypress = function(event) {
 		case undefined:
 			//array is empty (only base gui is up)
 			if("wads".includes(event.key)){
-				selectionController(event.keyCode);
+				selectionController(event.key);
 			}else if("?h".includes(event.key)){
 				keyCaptureStack.push("help");
 				helpPopupMenu.popupMenuDiv.hidden = false;
@@ -39,17 +39,24 @@ window.onkeypress = function(event) {
 	}
 }
 
-function selectionController(keyCode){
-	//TODO shorten this somehow
+function selectionController(key){
 	//TODO make selectionText slightly farther from vertical center when selection is active
+	var direction = 0;
+	var actionOffset = 0;
+	//w=0,a=1,d=2,s=3
+	switch (key){
+		case "s": direction++;
+		case "d": direction++;
+		case "a": direction++;
+	}
 	if(selectedSelection == null){
-		if(keyCode == 119){
+		if(key == "w"){
 			selectedSelection = topMainSelection;
 			selectedSelection.style.left="calc(50% - 150px)";
-		}else if (keyCode == 97){
+		}else if (key == "a"){
 			selectedSelection = leftMainSelection;
 			selectedSelection.style.top="calc(50% - 75px)";
-		}else if (keyCode == 100){
+		}else if (key == "d"){
 			selectedSelection = rightMainSelection;
 			selectedSelection.style.top="calc(50% - 75px)";
 		}else{
@@ -58,62 +65,22 @@ function selectionController(keyCode){
 		}
 		selectedSelection.style.width="300px";
 		selectedSelection.style.height="150px";
-	}else if(selectedSelection == topMainSelection){
-		if(keyCode == 119){
-			selectedAction(0);
-		}else if (keyCode == 97){
-			selectedAction(1);
-		}else if (keyCode == 100){
-			selectedAction(2);
+	}else{
+		//top=0,left=4,right=8,bottom=12
+		switch(selectedSelection){
+			case bottomMainSelection: actionOffset += 4
+			case rightMainSelection: actionOffset += 4
+			case leftMainSelection: actionOffset += 4;
+		}
+		if(selectedSelection == topMainSelection || selectedSelection == bottomMainSelection){
+			selectedSelection.style.left="calc(50% - 100px)";
 		}else{
-			selectedAction(3);
+			selectedSelection.style.top="calc(50% - 50px)";
 		}
 		selectedSelection.style.width="200px";
 		selectedSelection.style.height="100px";
-		selectedSelection.style.left="calc(50% - 100px)";
 		selectedSelection = null;
-	}else if(selectedSelection == leftMainSelection){
-		if(keyCode == 119){
-			selectedAction(4);
-		}else if (keyCode == 97){
-			selectedAction(5);
-		}else if (keyCode == 100){
-			selectedAction(6);
-		}else{
-			selectedAction(7);
-		}
-		selectedSelection.style.width="200px";
-		selectedSelection.style.height="100px";
-		selectedSelection.style.top="calc(50% - 50px)";
-		selectedSelection = null;
-	}else if(selectedSelection == rightMainSelection){
-		if(keyCode == 119){
-			selectedAction(8);
-		}else if (keyCode == 97){
-			selectedAction(9);
-		}else if (keyCode == 100){
-			selectedAction(10);
-		}else{
-			selectedAction(11);
-		}
-		selectedSelection.style.width="200px";
-		selectedSelection.style.height="100px";
-		selectedSelection.style.top="calc(50% - 50px)";
-		selectedSelection = null;
-	}else if(selectedSelection == bottomMainSelection){
-		if(keyCode == 119){
-			selectedAction(12);
-		}else if (keyCode == 97){
-			selectedAction(13);
-		}else if (keyCode == 100){
-			selectedAction(14);
-		}else{
-			selectedAction(15);
-		}
-		selectedSelection.style.width="200px";
-		selectedSelection.style.height="100px";
-		selectedSelection.style.left="calc(50% - 100px)";
-		selectedSelection = null;
+		selectedAction(actionOffset+direction);
 	}
 }
 
