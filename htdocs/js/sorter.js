@@ -6,6 +6,7 @@ var leftMainSelection = document.getElementById("leftMainSelection");
 var rightMainSelection = document.getElementById("rightMainSelection");
 var bottomMainSelection = document.getElementById("bottomMainSelection");
 var viewerHolder = document.getElementById("viewerHolder");
+var viewerPanzoom;
 var selectedSelection = null;
 var keyCaptureStack = [];
 
@@ -13,8 +14,8 @@ window.onkeypress = function(event) {
 	// keyCaptureStack's last element tells us what gui we should use for keypresses.
 	switch(keyCaptureStack[keyCaptureStack.length-1]){
 		case "help":
-			if(event.key == "Escape"){
-				//STUB
+			if("?h".includes(event.key)){
+				helpPopupMenu.hideMenu();
 			}
 			break;
 		case "controlMenu":
@@ -22,7 +23,8 @@ window.onkeypress = function(event) {
 				//key is a number 0-9
 				selectedControlMenu.selectAction(event.key);
 			}else if("?h".includes(event.key)){
-				//STUB
+				keyCaptureStack.push("help");
+				helpPopupMenu.popupMenuDiv.hidden = false;
 			}
 			break;
 		case undefined:
@@ -30,7 +32,8 @@ window.onkeypress = function(event) {
 			if("wads".includes(event.key)){
 				selectionController(event.keyCode);
 			}else if("?h".includes(event.key)){
-				//STUB
+				keyCaptureStack.push("help");
+				helpPopupMenu.popupMenuDiv.hidden = false;
 			}
 			break;
 	}
@@ -120,13 +123,25 @@ function selectedAction(selectionNumber){
 	}else if(selectionNumber < 12){
 		moveImageToFolder(selectionNumber-1-Math.floor(selectionNumber/5));
 	}else{
-		controlMenuActivate(selectionNumber-12);
+		switch(selectionNumber){
+			case 12:
+				selectedControlMenu = sortControlMenu;
+				break;
+			case 13:
+				selectedControlMenu = folderControlMenu;
+				break;
+			case 14:
+				selectedControlMenu = fileControlMenu;
+				break;
+		}
+		selectedControlMenu.controlMenuDiv.hidden = false;
+		keyCaptureStack.push("controlMenu");
 	}
 }
 
 function updateViewer(fileLocation){
-	//STUB
-	//clear the holder
+	//clear the holder and panzoom
+	if(viewerPanzoom)viewerPanzoom.dispose();
 	viewerHolder.innerHTML = "";
 	var newViewer;
 	switch(fileLocation.split(".").pop()){
@@ -136,6 +151,7 @@ function updateViewer(fileLocation){
 			break;
 		//video
 		case "mp4": case "webm":
+			//FIXME video keyboard shortcuts and click events conflict with panzoom
 			newViewer = document.createElement("video");
 			newViewer.autoplay = true;
 			newViewer.loop = true;
@@ -150,6 +166,7 @@ function updateViewer(fileLocation){
 	newViewer.setAttribute("id","viewer");
 	newViewer.setAttribute("src",fileLocation);
 	viewerHolder.append(newViewer);
+	viewerPanzoom = panzoom(newViewer);
 }
 
 function updateFolders(folderList){
@@ -214,18 +231,20 @@ class controlMenu {
 	}
 }
 class popupMenu {
-	constructor(variableName,title,innerHtml,position,size){
+	constructor(variableName,title,width,height,leftPos,topPos,innerHtml){
 		//for some reason it only lets me make methods here
 		this.hideMenu = function(){
-			//hide and deselect menu then stop capturing keypresses
+			//hide then stop capturing keypresses
 			this.popupMenuDiv.hidden = true;
-			selectedControlMenu = null;
 			keyCaptureStack.pop();
 		};
 		//create main div and start it hidden
 		this.popupMenuDiv = document.createElement("div");
 		this.popupMenuDiv.className = "popupMenu";
-		//TODO set pos and size
+		if(width != "")this.popupMenuDiv.style.width = width;
+		if(height != "")this.popupMenuDiv.style.height = height;
+		if(leftPos != "")this.popupMenuDiv.style.left = leftPos;
+		if(topPos != "")this.popupMenuDiv.style.top = topPos;
 		this.popupMenuDiv.hidden = true;
 		//create and append title
 		var popupMenuTitle = document.createElement("div");
@@ -235,7 +254,7 @@ class popupMenu {
 		//create and append innerHtml
 		var popupMenuItem = document.createElement("div");
 		popupMenuItem.className = "popupMenuItem";
-		popupMenuItem.appendChild(document.createTextNode(innerHtml));
+		popupMenuItem.innerHTML = innerHtml;
 		this.popupMenuDiv.appendChild(popupMenuItem);
 		//add finished menu to html
 		document.body.append(this.popupMenuDiv);
@@ -251,24 +270,10 @@ var folderControlMenu = new controlMenu("folderControlMenu","Folder Control",
 var fileControlMenu = new controlMenu("fileControlMenu","File Control",
 	["cancel","rename file","set external source","delete file","blacklist file"],
 	[Function.prototype,fileRename,fileSetExternalSource,fileDelete,fileBlacklist]);
-var helpPopupMenu = new popupMenu("helpPopupMenu","Help","a","","");
+var helpPopupMenu = new popupMenu("helpPopupMenu","Help","","","","",
+"help controls:<br>&emsp;h?: open/close help menu<br>selection controls:<br>&emsp;wasd (with no selection): select inital selection<br>&emsp;wasd (with selection): select option in selection<br>");
 var selectedControlMenu = null;
 
-function controlMenuActivate(controlMenuNumber){
-	switch(controlMenuNumber){
-		case 0:
-			selectedControlMenu = sortControlMenu;
-			break;
-		case 1:
-			selectedControlMenu = folderControlMenu;
-			break;
-		case 2:
-			selectedControlMenu = fileControlMenu;
-			break;
-	}
-	selectedControlMenu.controlMenuDiv.hidden = false;
-	keyCaptureStack.push("controlMenu");
-}
 ////////////////////////////////
 //data and backend interaction//
 ////////////////////////////////
