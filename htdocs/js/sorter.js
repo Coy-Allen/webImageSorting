@@ -5,6 +5,7 @@ var topMainSelection = document.getElementById("topMainSelection");
 var leftMainSelection = document.getElementById("leftMainSelection");
 var rightMainSelection = document.getElementById("rightMainSelection");
 var bottomMainSelection = document.getElementById("bottomMainSelection");
+var viewerHolder = document.getElementById("viewerHolder");
 var selectedSelection = null;
 var keyCaptureStack = [];
 
@@ -123,8 +124,32 @@ function selectedAction(selectionNumber){
 	}
 }
 
-function updateImage(){
+function updateViewer(fileLocation){
 	//STUB
+	//clear the holder
+	viewerHolder.innerHTML = "";
+	var newViewer;
+	switch(fileLocation.split(".").pop()){
+		//images
+		case "jpeg": case "png": case "jpg": case "gif":
+			newViewer = document.createElement("img");
+			break;
+		//video
+		case "mp4": case "webm":
+			newViewer = document.createElement("video");
+			newViewer.autoplay = true;
+			newViewer.loop = true;
+			newViewer.controls = true;
+			break;
+		default:
+			return;//FIXME
+			console.log("WARN: unknown ext found "+fileLocation);
+			break;
+	}
+	//set attribs and add to html
+	newViewer.setAttribute("id","viewer");
+	newViewer.setAttribute("src",fileLocation);
+	viewerHolder.append(newViewer);
 }
 
 function updateFolders(folderList){
@@ -150,11 +175,14 @@ function updateFolders(folderList){
 ////////////////////
 class controlMenu {
 	constructor(variableName,title,itemNames,itemFunctions){
-		//for some reason it only lets me do this here
+		//for some reason it only lets me make methods here
 		this.selectAction = function(actionNumber){
 			if(actionNumber >= this.itemFunctions.length) return;
 			console.log(actionNumber);
 			this.itemFunctions[actionNumber]();
+			this.hideMenu();
+		};
+		this.hideMenu = function(){
 			//hide and deselect menu then stop capturing keypresses
 			this.controlMenuDiv.hidden = true;
 			selectedControlMenu = null;
@@ -182,19 +210,48 @@ class controlMenu {
 			item.appendChild(document.createTextNode(""+i+". "+itemNames[i]));
 			this.controlMenuDiv.appendChild(item);
 		}
-		document.body.prepend(this.controlMenuDiv);
+		document.body.append(this.controlMenuDiv);
+	}
+}
+class popupMenu {
+	constructor(variableName,title,innerHtml,position,size){
+		//for some reason it only lets me make methods here
+		this.hideMenu = function(){
+			//hide and deselect menu then stop capturing keypresses
+			this.popupMenuDiv.hidden = true;
+			selectedControlMenu = null;
+			keyCaptureStack.pop();
+		};
+		//create main div and start it hidden
+		this.popupMenuDiv = document.createElement("div");
+		this.popupMenuDiv.className = "popupMenu";
+		//TODO set pos and size
+		this.popupMenuDiv.hidden = true;
+		//create and append title
+		var popupMenuTitle = document.createElement("div");
+		popupMenuTitle.className = "popupMenuTitle";
+		popupMenuTitle.appendChild(document.createTextNode(title));
+		this.popupMenuDiv.appendChild(popupMenuTitle);
+		//create and append innerHtml
+		var popupMenuItem = document.createElement("div");
+		popupMenuItem.className = "popupMenuItem";
+		popupMenuItem.appendChild(document.createTextNode(innerHtml));
+		this.popupMenuDiv.appendChild(popupMenuItem);
+		//add finished menu to html
+		document.body.append(this.popupMenuDiv);
 	}
 }
 //function.prototype is used as a noop for the cancel item
 var sortControlMenu = new controlMenu("sortControlMenu","Sorting Control",
-	["cancel","skip file","finish file","request new batch"],
-	[Function.prototype,sortingSkipFile,sortingFinishFile,sortingRequest]);
+	["cancel","skip file","finish file","request new batch","apply changes"],
+	[Function.prototype,sortingSkipFile,sortingFinishFile,sortingRequest,sortingSend]);
 var folderControlMenu = new controlMenu("folderControlMenu","Folder Control",
 	["cancel","create folder","rename folder","delete folder"],
 	[Function.prototype,folderCreate,folderRename,folderDelete]);
 var fileControlMenu = new controlMenu("fileControlMenu","File Control",
 	["cancel","rename file","set external source","delete file","blacklist file"],
 	[Function.prototype,fileRename,fileSetExternalSource,fileDelete,fileBlacklist]);
+var helpPopupMenu = new popupMenu("helpPopupMenu","Help","a","","");
 var selectedControlMenu = null;
 
 function controlMenuActivate(controlMenuNumber){
@@ -229,6 +286,9 @@ function sortingSkipFile(){
 	//STUB
 }
 function sortingRequest(){
+	//STUB
+}
+function sortingSend(){
 	//STUB
 }
 function folderCreate(){

@@ -100,27 +100,6 @@ function parseFileList(list){
 	}
 }
 function createPicture(pictureInfo,parentNode){
-	/* html if its an image:
-	 * <a><div><img></img><span></span></div></a>
-	 * <a class="pictureLink" href="javascript:window.open("/images/dump/00009aeff717bade5013acc9f7b542f5.jpg","","width=700,height=700")">
-	 *   <div class="pictureFrame">
-	 *    <img src="/images/dump/00009aeff717bade5013acc9f7b542f5.jpg" class="picture">
-	 *    <span class="pictureName">00009aeff717bade5013acc9f7b542f5.jpg</span>
-	 *  </div>
-	 *  </a>
-	 *
-	 *  html if its a folder
-	 * <a><div><img></img><span></span></div></a>
-	 * <a class="pictureLink" href=""/viewer.html?dir=/dump/&start=0&step=25"">
-	 *   <div class="pictureFrame">
-	 *    <img src="/images-server/folder.png" class="picture">
-	 *    <span class="pictureName">dump</span>
-	 *  </div>
-	 *  </a>
-	 *
-	 *  html if its a video
-	 *  TODO
-	 */
 	//create <a> tag with CSS
 	link = document.createElement("a");
 	link.setAttribute("class","pictureLink");
