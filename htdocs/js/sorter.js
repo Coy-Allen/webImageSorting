@@ -18,13 +18,15 @@ window.onkeypress = function(event) {
 				helpPopupMenu.hideMenu();
 			}
 			break;
+		case "sortingRequest":
+			break;
 		case "controlMenu":
 			if("0123456789".includes(event.key)){
 				//key is a number 0-9
 				selectedControlMenu.selectAction(event.key);
 			}else if("?h".includes(event.key)){
 				keyCaptureStack.push("help");
-				helpPopupMenu.popupMenuDiv.hidden = false;
+				helpPopupMenu.mainDiv.hidden = false;
 			}
 			break;
 		case undefined:
@@ -33,7 +35,7 @@ window.onkeypress = function(event) {
 				selectionController(event.key);
 			}else if("?h".includes(event.key)){
 				keyCaptureStack.push("help");
-				helpPopupMenu.popupMenuDiv.hidden = false;
+				helpPopupMenu.mainDiv.hidden = false;
 			}
 			break;
 	}
@@ -101,7 +103,7 @@ function selectedAction(selectionNumber){
 				selectedControlMenu = fileControlMenu;
 				break;
 		}
-		selectedControlMenu.controlMenuDiv.hidden = false;
+		selectedControlMenu.mainDiv.hidden = false;
 		keyCaptureStack.push("controlMenu");
 	}
 }
@@ -158,8 +160,8 @@ function updateFolders(folderList){
 //menus and popups//
 ////////////////////
 class controlMenu {
-	constructor(variableName,title,itemNames,itemFunctions){
-		//for some reason it only lets me make methods here
+	constructor(variableName,menuTitle,width,height,leftPos,topPos,itemNames,itemFunctions){
+		//for some reason it aonly lets me make methods here
 		this.selectAction = function(actionNumber){
 			if(actionNumber >= this.itemFunctions.length) return;
 			console.log(actionNumber);
@@ -168,21 +170,25 @@ class controlMenu {
 		};
 		this.hideMenu = function(){
 			//hide and deselect menu then stop capturing keypresses
-			this.controlMenuDiv.hidden = true;
+			this.mainDiv.hidden = true;
 			selectedControlMenu = null;
 			keyCaptureStack.pop();
 		};
 		if(itemNames.length != itemFunctions.length) console.error("controlMenu: names and functions not in 1:1 pairs");
 		this.itemFunctions = itemFunctions;
 		//create main div and start it hidden
-		this.controlMenuDiv = document.createElement("div");
-		this.controlMenuDiv.className = "controlMenu";
-		this.controlMenuDiv.hidden = true;
+		this.mainDiv = document.createElement("div");
+		this.mainDiv.className = "controlMenu";
+		if(width != "")this.mainDiv.style.width = width;
+		if(height != "")this.mainDiv.style.height = height;
+		if(leftPos != "")this.mainDiv.style.left = leftPos;
+		if(topPos != "")this.mainDiv.style.top = topPos;
+		this.mainDiv.hidden = true;
 		//create and append title
-		var controlMenuTitle = document.createElement("div");
-		controlMenuTitle.className = "controlMenuTitle";
-		controlMenuTitle.appendChild(document.createTextNode(title));
-		this.controlMenuDiv.appendChild(controlMenuTitle);
+		var title = document.createElement("div");
+		title.className = "menuTitle";
+		title.appendChild(document.createTextNode(menuTitle));
+		this.mainDiv.appendChild(title);
 		//create and append each item
 		for(var i=0;i<itemNames.length;i++){
 			var item = document.createElement("div");
@@ -192,53 +198,55 @@ class controlMenu {
 			//no way to get this.selectAction into this context so we need the variableName our object belongs too
 			item.setAttribute("onclick",variableName+".selectAction(this.getAttribute(\"data-actionnumber\"))");
 			item.appendChild(document.createTextNode(""+i+". "+itemNames[i]));
-			this.controlMenuDiv.appendChild(item);
+			this.mainDiv.appendChild(item);
 		}
-		document.body.append(this.controlMenuDiv);
+		document.body.append(this.mainDiv);
 	}
 }
 class popupMenu {
-	constructor(variableName,title,width,height,leftPos,topPos,innerHtml){
+	constructor(menuTitle,width,height,leftPos,topPos,innerHtml){
 		//for some reason it only lets me make methods here
 		this.hideMenu = function(){
 			//hide then stop capturing keypresses
-			this.popupMenuDiv.hidden = true;
+			this.mainDiv.hidden = true;
 			keyCaptureStack.pop();
 		};
 		//create main div and start it hidden
-		this.popupMenuDiv = document.createElement("div");
-		this.popupMenuDiv.className = "popupMenu";
-		if(width != "")this.popupMenuDiv.style.width = width;
-		if(height != "")this.popupMenuDiv.style.height = height;
-		if(leftPos != "")this.popupMenuDiv.style.left = leftPos;
-		if(topPos != "")this.popupMenuDiv.style.top = topPos;
-		this.popupMenuDiv.hidden = true;
+		this.mainDiv = document.createElement("div");
+		this.mainDiv.className = "popupMenu";
+		if(width != "")this.mainDiv.style.width = width;
+		if(height != "")this.mainDiv.style.height = height;
+		if(leftPos != "")this.mainDiv.style.left = leftPos;
+		if(topPos != "")this.mainDiv.style.top = topPos;
+		this.mainDiv.hidden = true;
 		//create and append title
-		var popupMenuTitle = document.createElement("div");
-		popupMenuTitle.className = "popupMenuTitle";
-		popupMenuTitle.appendChild(document.createTextNode(title));
-		this.popupMenuDiv.appendChild(popupMenuTitle);
+		var title = document.createElement("div");
+		title.className = "menuTitle";
+		title.appendChild(document.createTextNode(menuTitle));
+		this.mainDiv.appendChild(title);
 		//create and append innerHtml
-		var popupMenuItem = document.createElement("div");
-		popupMenuItem.className = "popupMenuItem";
-		popupMenuItem.innerHTML = innerHtml;
-		this.popupMenuDiv.appendChild(popupMenuItem);
+		var item = document.createElement("div");
+		item.className = "popupMenuItem";
+		item.innerHTML = innerHtml;
+		this.mainDiv.appendChild(item);
 		//add finished menu to html
-		document.body.append(this.popupMenuDiv);
+		document.body.append(this.mainDiv);
 	}
 }
 //function.prototype is used as a noop for the cancel item
-var sortControlMenu = new controlMenu("sortControlMenu","Sorting Control",
+var sortControlMenu = new controlMenu("sortControlMenu","Sorting Control","","","","",
 	["cancel","skip file","finish file","request new batch","apply changes"],
 	[Function.prototype,sortingSkipFile,sortingFinishFile,sortingRequest,sortingSend]);
-var folderControlMenu = new controlMenu("folderControlMenu","Folder Control",
+var folderControlMenu = new controlMenu("folderControlMenu","Folder Control","","","","",
 	["cancel","create folder","rename folder","delete folder"],
 	[Function.prototype,folderCreate,folderRename,folderDelete]);
-var fileControlMenu = new controlMenu("fileControlMenu","File Control",
+var fileControlMenu = new controlMenu("fileControlMenu","File Control","","","","",
 	["cancel","rename file","set external source","delete file","blacklist file"],
 	[Function.prototype,fileRename,fileSetExternalSource,fileDelete,fileBlacklist]);
-var helpPopupMenu = new popupMenu("helpPopupMenu","Help","","","","",
+var helpPopupMenu = new popupMenu("Help","","","","",
 "help controls:<br>&emsp;h?: open/close help menu<br>selection controls:<br>&emsp;wasd (with no selection): select inital selection<br>&emsp;wasd (with selection): select option in selection<br>");
+var sortingRequest = new popupMenu("Sorting Request","","","","",
+"Directory: <input type=\"text\" name=\"directory\" value=\"unsorted/\"><br>Ammount: <input type=\"number\" name=\"quantity\" value=5 min=0 max=50><br><input type=\"submit\" onclick=\"sortingRequestSend()\">");
 var selectedControlMenu = null;
 
 ////////////////////////////////
@@ -258,7 +266,13 @@ function sortingSkipFile(){
 	//STUB
 }
 function sortingRequest(){
+	keyCaptureStack.push("sortingRequest");
+	sortingRequest.mainDiv.hidden = false;
+}
+function sortingRequestSend(){
 	//STUB
+	keyCaptureStack.pop();
+	sortingRequest.mainDiv.hidden = true;
 }
 function sortingSend(){
 	//STUB

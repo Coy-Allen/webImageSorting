@@ -55,7 +55,7 @@ body{
 	top:calc(50% - 100px);
 	border:solid 1px black;
 }
-.controlMenuTitle{
+.menuTitle{
 	height:20px;
 	padding-left:5px;
 	line-height:20px;
@@ -79,12 +79,6 @@ body{
 	left:calc(50% - 300px);
 	top:calc(50% - 250px);
 	border:solid 1px black;
-}
-.popupMenuTitle{
-	height:20px;
-	padding-left:5px;
-	line-height:20px;
-	background-color:grey;
 }
 .popupMenuItem{
 	padding:5px;
