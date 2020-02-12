@@ -4,69 +4,69 @@ header("Content-Type: application/json");
 header("Cache-Control: no-cache");
 
 /*
-***receved***
-<post REQUEST=<json>>
-{
-	"fileSorting":[
-		{
-			"localLocation": "unsorted/000.png",
-			"destination": "unsorted/p/"
-		},
-		{
-			"localLocation": "unsorted/fileDoesntExist.parchment",
-			"destination": "unsorted/np/"
-		},
-		{
-			"localLocation": "unsorted/111.png",
-			"destination": "../"
-		},
-	],
-	"fileRequests":[
-		{
-			"directory": "unsorted/",
-			"ammount": 1
-		},
-		{
-			"directory": "unsorted/np/",
-			"ammount": 1
-		}
-	]
-}
+	***receved***
+	<post REQUEST=<json>>
+	{
+		"fileSorting":[
+			{
+				"localLocation": "unsorted/000.png",
+				"destination": "unsorted/p/"
+			},
+			{
+				"localLocation": "unsorted/fileDoesntExist.parchment",
+				"destination": "unsorted/np/"
+			},
+			{
+				"localLocation": "unsorted/111.png",
+				"destination": "../"
+			},
+		],
+		"fileRequests":[
+			{
+				"directory": "unsorted/",
+				"ammount": 1
+			},
+			{
+				"directory": "unsorted/np/",
+				"ammount": 1
+			}
+		]
+	}
 
-***response***
-<json>
-{
-	"sortResults":{
-		"filesMoved": 1,
-		"errors": 1,
-		"warnings": 1,
-		"messages": "ERROR: file not found\nWARN: invalid destination"
-	},
-	"requestResponse":[
-		{
-			"sourceDirectory": "images/unsorted/",
-			"files": [
-				"AAA.png"
-			],
-			"subDirectories":[
-				"np",
-				"p"
-			]
+	***response***
+	<json>
+	{
+		"sortResults":{
+			"filesMoved": 1,
+			"errors": 1,
+			"warnings": 1,
+			"messages": "ERROR: file not found\nWARN: invalid destination"
 		},
-		{
-			"sourceDirectory": "images/unsorted/np/",
-			"files": [
-				"BBB.png"
-			],
-			"subDirectories":[
-				"memes",
-				"reactionImages",
-				"gore",
-				"other"
-			]
-		}
-	]
-}
+		"requestResponse":[
+			{
+				"sourceDirectory": "images/unsorted/",
+				"files": [
+					"AAA.png"
+				],
+				"subDirectories":[
+					"np",
+					"p"
+				]
+			},
+			{
+				"sourceDirectory": "images/unsorted/np/",
+				"files": [
+					"BBB.png"
+				],
+				"subDirectories":[
+					"memes",
+					"reactionImages",
+					"gore",
+					"other"
+				]
+			}
+		]
+	}
 */
 #setup database, folder locations, and file list
 include('../../serviceConfig.php');
@@ -74,14 +74,14 @@ $db = mysqli_connect($dbConfig['host'],$dbConfig['username'],$dbConfig['password
 
 
 #unpack json POST
-$postJsonData = json_decode(@$_POST["request"]);
+$postJsonData = json_decode(file_get_contents("php://input"),true);
 
-$responseJsonData = array();
+$responseJsonData = [];
 
-if(@$postJsonData["fileSorting"]){
+if($postJsonData["fileSorting"]){
 	#TODO
 }
-if(@$postJsonData["fileRequests"]){
+if($postJsonData["fileRequests"]){
 	$requestResponse = array();
 	foreach($postJsonData["fileRequests"] as $fileRequest){
 		if(1 > $fileRequest["ammount"]){$fileRequest["ammount"] = 5;}
@@ -105,9 +105,14 @@ if(@$postJsonData["fileRequests"]){
 		$responsePart["files"] = array_slice(array_values($files),0,$fileRequest["ammount"]);
 		#get subdirectories
 		$responsePart["subdirectories"] = glob($_SERVER['DOCUMENT_ROOT'].$responsePart["sourceDirectory"]."*",GLOB_ONLYDIR);
+		foreach($responsePart["subdirectories"] as &$subdir){
+			#cutoff everything but the foldername
+			$subdir = substr($subdir,strrpos($subdir,'/')+1);
+		}
+		unset($subdir);
 		array_push($requestResponse,$responsePart);
 	}
-	array_push($responseJsonData,$requestResponse);
+	$responseJsonData["requestResponse"] = $requestResponse;
 }
 
 echo json_encode($responseJsonData);

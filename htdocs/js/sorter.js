@@ -164,7 +164,6 @@ class controlMenu {
 		//for some reason it aonly lets me make methods here
 		this.selectAction = function(actionNumber){
 			if(actionNumber >= this.itemFunctions.length) return;
-			console.log(actionNumber);
 			this.itemFunctions[actionNumber]();
 			this.hideMenu();
 		};
@@ -246,15 +245,48 @@ var fileControlMenu = new controlMenu("fileControlMenu","File Control","","","",
 var helpPopupMenu = new popupMenu("Help","","","","",
 "help controls:<br>&emsp;h?: open/close help menu<br>selection controls:<br>&emsp;wasd (with no selection): select inital selection<br>&emsp;wasd (with selection): select option in selection<br>");
 var sortingRequest = new popupMenu("Sorting Request","","","","",
-"Directory: <input type=\"text\" name=\"directory\" value=\"unsorted/\"><br>Ammount: <input type=\"number\" name=\"quantity\" value=5 min=0 max=50><br><input type=\"submit\" onclick=\"sortingRequestSend()\">");
+"Directory: <input type=\"text\" id=\"sortingRequestDirectory\" value=\"unsorted/\"><br>Ammount: <input type=\"number\" id=\"sortingRequestQuantity\" value=5 min=0 max=50><br><input type=\"submit\" onclick=\"sortingRequestSend()\">");
 var selectedControlMenu = null;
 
 ////////////////////////////////
 //data and backend interaction//
 ////////////////////////////////
-var backendResponse;
-var nextRequest;
+var backendResponse = [];
+var nextRequest = {"fileSorting" : [], "fileRequests" : []};
+var currentImageDirIndex = 0;
+var currentImageIndex = 0;
+var xhttp = new XMLHttpRequest();
+xhttp.open("POST","/backend/sorter.php");
 
+xhttp.onreadystatechange = function(){
+	if(xhttp.readyState == 4 && xhttp.status == 200){
+		backendResponse = JSON.parse(xhttp.responseText);
+		currentImageDirIndex = 0;
+		if(backendResponse["requestResponse"].length == 0 || backendResponse["requestResponse"][currentImageDirIndex]["files"].length == 0){
+			currentImageIndex = 0;
+		}else{
+			currentImageIndex = -1; //showNextImage inc this by 1
+			updateFolders(backendResponse["requestResponse"][currentImageDirIndex]["subdirectories"]);
+			showNextImage();
+		}
+	}
+	//TODO set a gui popup to show that we are waiting for a backen response
+}
+function showNextImage(){
+	currentImageIndex++;
+	if(backendResponse["requestResponse"][currentImageDirIndex]["files"].length <= currentImageIndex){
+		currentImageDirIndex++;
+		currentImageIndex = 0;
+		if(backendResponse["requestResponse"].length <= currentImageDirIndex){
+			//FIXME we are out of images. cleanup and prepare for next batch. for now we will just loop back.
+			currentImageDirIndex = 0;
+			currentImageIndex = 0;
+		}else{
+			updateFolders(backendResponse["requestResponse"][currentImageDirIndex]["subdirectories"]);
+		}
+	}
+	updateViewer(backendResponse["requestResponse"][currentImageDirIndex]["sourceDirectory"]+backendResponse["requestResponse"][currentImageDirIndex]["files"][currentImageIndex]);
+}
 
 function moveImageToFolder(folderNumber){
 	//STUB
@@ -263,19 +295,27 @@ function sortingFinishFile(){
 	//STUB
 }
 function sortingSkipFile(){
-	//STUB
+	if(backendResponse.length == 0 || backendResponse["requestResponse"].length == 0 || backendResponse["requestResponse"][currentImageDirIndex]["files"].length == 0){
+		return;
+	}
+	showNextImage()
 }
 function sortingRequest(){
 	keyCaptureStack.push("sortingRequest");
 	sortingRequest.mainDiv.hidden = false;
 }
 function sortingRequestSend(){
-	//STUB
 	keyCaptureStack.pop();
 	sortingRequest.mainDiv.hidden = true;
+	nextRequest["fileRequests"].push({
+		"directory" : document.getElementById("sortingRequestDirectory").value,
+		"ammount" : document.getElementById("sortingRequestQuantity").value
+	});
+	sortingSend();
 }
 function sortingSend(){
-	//STUB
+	xhttp.send(JSON.stringify(nextRequest));
+	nextRequest = {"fileSorting" : [], "fileRequests" : []};
 }
 function folderCreate(){
 	//STUB
