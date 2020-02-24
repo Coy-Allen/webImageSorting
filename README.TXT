@@ -15,9 +15,9 @@ create mysql database with these tables:
 make the serviceConfig.php file and fill in the correct info
 make the htdocs/images folder and immediate subfolders
 recomended permisions (run in same folder as serviceConfig.php and README.txt)
-umask 0027				;makes all new files rw-r-----
-chmod -R 640 *				;owner has full perms while web server has read
-find . -type d -exec chmod ug+x {} +	;give web server and owner execute on directiories
-find . -type d -exec chmod g+s {} +	;make sure new items have the correct group
-chmod -R g+w htdocs/images/*		;give web server write on our images
-chown -R webadmin:apache *		;set this to your account and webgroup
+umask 0027                              ;makes all new files rw-r-----
+chmod -R 640 *                          ;owner has full perms while web server has read
+find . -type d -exec chmod ug+x {} +    ;give web server and owner execute on directiories
+find . -type d -exec chmod g+s {} +     ;make sure new items have the correct group
+chmod -R g+w htdocs/images/*            ;give web server write on our images
+chown -R webadmin:apache *              ;set this to your account and webgroup

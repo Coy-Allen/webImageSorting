@@ -1,7 +1,6 @@
 <?php
 $imageLocation = array(
 	"images" => $_SERVER['DOCUMENT_ROOT']."/images/",
-	"upload" => $_SERVER['DOCUMENT_ROOT']."/images/upload/",
 	"thumbs" => $_SERVER['DOCUMENT_ROOT']."/thumbs/",
 	"dump" => $_SERVER['DOCUMENT_ROOT']."/images/dump/",
 	"unsorted" => $_SERVER['DOCUMENT_ROOT']."/images/unsorted/",
