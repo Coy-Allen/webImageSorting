@@ -62,15 +62,12 @@ function parseFileList(list){
 			//folders name should be next in the parts list if not then we are at the base dir
 			list[i].fileName = list[i].pathParts.pop();
 			if(list[i].fileName === undefined){list[i].fileName = "/";}
-			list[i].thumb = "/images-server/folder.png";
 			list[i].type = "folder";
 			createPicture(list[i],pictureHolder);
 		}else{
 			switch(list[i].fileExt.toLowerCase()){
 			//undesired image formats
 			case "jpeg":
-				//not from 4chan
-				console.log("WARN: "+list[i].fileExt+" image found "+list[i].fileName);
 			//desired image formats
 			case "png": case "jpg": case "gif":
 				list[i].type = "image";
@@ -78,21 +75,15 @@ function parseFileList(list){
 				break;
 			//undesired video formats
 			case "mp4":
-				//not from 4chan
-				console.log("WARN: "+list[i].fileExt+" video found "+list[i].fileName);
 			//desired video formats
 			case "webm":
 				list[i].type = "video";
-				list[i].thumb = "/images-server/video.png";
 				//TODO show real videofile
 				createPicture(list[i],pictureHolder);
 				break;
 			//unknown or no ext
 			default:
 				list[i].type = "other";
-				console.log("WARN: "+list[i].fileExt+" unknown found "+list[i].fileName);
-				//cant decide whether to replace the thumb or not. will replace for now
-				list[i].thumb = "/images-server/documents.png";
 				createPicture(list[i],pictureHolder);
 				break;
 			}

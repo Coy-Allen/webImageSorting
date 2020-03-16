@@ -31,8 +31,12 @@ array_push($response,array(
 	"imageCount"=>$imageCount
 ));
 
-#add parent dir link
-if(strlen($dir) > strlen($imageLocation["images"])+1){addFile(dirname($dir,2));}
+#add parent dir link and edit thumbnail
+if(strlen($dir) > strlen($imageLocation["images"])+1){
+	addFile(dirname($dir,2));
+	#this should always be the second element
+	$response[1]["thumb"]="/images-server/back.png";
+}
 #get file type
 for($i=$start;$i<$end;++$i){
 	addFile($files[$i]);
@@ -47,7 +51,7 @@ function addFile($file){
 	if(is_dir($file)){
 		array_push($response,array(
 			"src" => substr($file."/",strlen($imageLocation["images"])),
-			"thumb" => false
+			"thumb" => "/images-server/folder.png"
 		));
 	}else{
 		#find sha512 of file
@@ -58,9 +62,17 @@ function addFile($file){
 		mysqli_stmt_free_result($dbGetSha512);
 		$thumbnail=$imageLocation["thumbs"].bin2hex($sha512).".png";
 		#if we cant find a thumbnail then dont use one
-		if(is_null($sha512) or !file_exists($thumbnail)){
-			#TODO throw error
-			$thumbnail=$file;
+		if(true or is_null($sha512) or !file_exists($thumbnail)){
+			switch(pathinfo($file)["extension"]){
+				case "png": case "jpg": case "jpeg": case "gif":
+					$thumbnail=$file;
+					break;
+				case "webm": case "mp4":
+					$thumbnail=$_SERVER['DOCUMENT_ROOT']."/images-server/video.png";
+					break;
+				default:
+					$thumbnail=$_SERVER['DOCUMENT_ROOT']."/images-server/documents.png";
+			}
 		}
 		array_push($response,array(
 			"src"=>substr($file,strlen($_SERVER['DOCUMENT_ROOT'])),
