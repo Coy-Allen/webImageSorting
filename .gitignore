@@ -1,4 +1,5 @@
 htdocs/.storage
 htdocs/images
 serviceConfig.php
+htdocs/phpmyadmin
 *.swp

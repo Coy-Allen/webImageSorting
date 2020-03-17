@@ -85,7 +85,7 @@ for($i=0;$i<$fileCount;$i++){
 		}else{
 			#move image to new location and add it to the DB
 			rename($thisUpdate["localLocation"],$newLocalLocation);
-			$thisUpdate["localLocation"] = $newLocalLocation;
+			#$thisUpdate["localLocation"] = $newLocalLocation;
 			$sqlData["localLocation"] = $newLocalLocation;
 			mysqli_stmt_execute($dbAddEntry);
 		}
@@ -106,6 +106,7 @@ for($i=0;$i<$fileCount;$i++){
 			#exec("bash -c \"exec nohup setsid convert ".$thisUpdate["localLocation"]." -thumbnail '500x500>' ".$thumbnailName." > /dev/null 2>&1 &\"");
 		#}
 	}
+	$thisUpdate["localLocation"]=substr($thisUpdate["localLocation"],strlen($imageLocation["dump"]));
 	#send file info to client if the data has updated
 	echo "event: update".PHP_EOL;
 	echo "data: ".json_encode(
