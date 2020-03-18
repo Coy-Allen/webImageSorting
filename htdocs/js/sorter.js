@@ -10,8 +10,10 @@ var viewerPanzoom;
 var selectedSelection = null;
 var keyCaptureStack = [];
 
-window.onkeypress = function(event) {
+window.onkeyup = function(event) {
 	// keyCaptureStack's last element tells us what gui we should use for keypresses.
+	// FIXME: onkeyup must be used due to others fireing multiple times when held.
+	// however onkeyup feels delayed compared to onKeydown so we need another solution
 	switch(keyCaptureStack[keyCaptureStack.length-1]){
 		case "help":
 			if("?h".includes(event.key)){
@@ -19,6 +21,8 @@ window.onkeypress = function(event) {
 			}
 			break;
 		case "sortingRequest":
+			break;
+		case "folderCreate":
 			break;
 		case "controlMenu":
 			if("0123456789".includes(event.key)){
@@ -164,14 +168,14 @@ class controlMenu {
 		//for some reason it aonly lets me make methods here
 		this.selectAction = function(actionNumber){
 			if(actionNumber >= this.itemFunctions.length) return;
-			this.itemFunctions[actionNumber]();
 			this.hideMenu();
+			this.itemFunctions[actionNumber]();
 		};
 		this.hideMenu = function(){
 			//hide and deselect menu then stop capturing keypresses
 			this.mainDiv.hidden = true;
 			selectedControlMenu = null;
-			keyCaptureStack.pop();
+			keyCaptureStack.shift();
 		};
 		if(itemNames.length != itemFunctions.length) console.error("controlMenu: names and functions not in 1:1 pairs");
 		this.itemFunctions = itemFunctions;
@@ -246,6 +250,8 @@ var helpPopupMenu = new popupMenu("Help","","","","",
 "help controls:<br>&emsp;h?: open/close help menu<br>selection controls:<br>&emsp;wasd (with no selection): select inital selection<br>&emsp;wasd (with selection): select option in selection<br>");
 var sortingRequest = new popupMenu("Sorting Request","","","","",
 "Directory: <input type=\"text\" id=\"sortingRequestDirectory\" value=\"unsorted/\"><br>Ammount: <input type=\"number\" id=\"sortingRequestQuantity\" value=5 min=0 max=50><br><input type=\"submit\" onclick=\"sortingRequestSend()\">");
+var folderCreate = new popupMenu("New Folder","","","","",
+"Folder Name: <input type=\"text\" id=\"folderCreate\" value=\"\"><br><input type=\"submit\" onclick=\"folderCreateApply()\">");
 var selectedControlMenu = null;
 
 ////////////////////////////////
@@ -256,13 +262,12 @@ var nextRequest = {"fileSorting" : [], "fileRequests" : []};
 var currentImageDirIndex = 0;
 var currentImageIndex = 0;
 var xhttp = new XMLHttpRequest();
-xhttp.open("POST","/backend/sorter.php");
 
 xhttp.onreadystatechange = function(){
 	if(xhttp.readyState == 4 && xhttp.status == 200){
 		backendResponse = JSON.parse(xhttp.responseText);
 		currentImageDirIndex = 0;
-		if(backendResponse["requestResponse"].length == 0 || backendResponse["requestResponse"][currentImageDirIndex]["files"].length == 0){
+		if(backendResponse["requestResponse"] == undefined || backendResponse["requestResponse"].length == 0 || backendResponse["requestResponse"][currentImageDirIndex]["files"].length == 0){
 			currentImageIndex = 0;
 		}else{
 			currentImageIndex = -1; //showNextImage inc this by 1
@@ -278,9 +283,8 @@ function showNextImage(){
 		currentImageDirIndex++;
 		currentImageIndex = 0;
 		if(backendResponse["requestResponse"].length <= currentImageDirIndex){
-			//FIXME we are out of images. cleanup and prepare for next batch. for now we will just loop back.
-			currentImageDirIndex = 0;
-			currentImageIndex = 0;
+			sortingSend();
+			return;
 		}else{
 			updateFolders(backendResponse["requestResponse"][currentImageDirIndex]["subdirectories"]);
 		}
@@ -289,7 +293,15 @@ function showNextImage(){
 }
 
 function moveImageToFolder(folderNumber){
-	//STUB
+	if(folderNumber >= backendResponse["requestResponse"][currentImageDirIndex]["subdirectories"].length){
+		console.error("invalid folder number");
+		return;
+	}
+	nextRequest["fileSorting"].push({
+		"localLocation" : backendResponse["requestResponse"][currentImageDirIndex]["sourceDirectory"]+backendResponse["requestResponse"][currentImageDirIndex]["files"][currentImageIndex],
+		"destination" : backendResponse["requestResponse"][currentImageDirIndex]["subdirectories"][folderNumber]
+	});
+	showNextImage();
 }
 function sortingFinishFile(){
 	//STUB
@@ -305,8 +317,7 @@ function sortingRequest(){
 	sortingRequest.mainDiv.hidden = false;
 }
 function sortingRequestSend(){
-	keyCaptureStack.pop();
-	sortingRequest.mainDiv.hidden = true;
+	sortingRequest.hideMenu();
 	nextRequest["fileRequests"].push({
 		"directory" : document.getElementById("sortingRequestDirectory").value,
 		"ammount" : document.getElementById("sortingRequestQuantity").value
@@ -314,11 +325,22 @@ function sortingRequestSend(){
 	sortingSend();
 }
 function sortingSend(){
+	updateFolders([]);
+	updateViewer("");
+	xhttp.open("POST","/backend/sorter.php");
 	xhttp.send(JSON.stringify(nextRequest));
 	nextRequest = {"fileSorting" : [], "fileRequests" : []};
 }
 function folderCreate(){
 	//STUB
+	keyCaptureStack.push("folderCreate");
+	folderCreate.mainDiv.hidden = false;
+}
+function folderCreateApply(){
+	keyCaptureStack.pop();
+	folderCreate.mainDiv.hidden = true;
+	backendResponse["requestResponse"][currentImageDirIndex]["subdirectories"].push(document.getElementById("folderCreate").value);
+	updateFolders(backendResponse["requestResponse"][currentImageDirIndex]["subdirectories"]);
 }
 function folderRename(){
 	//STUB

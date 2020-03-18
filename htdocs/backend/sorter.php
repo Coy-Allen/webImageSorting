@@ -10,15 +10,15 @@ header("Cache-Control: no-cache");
 		"fileSorting":[
 			{
 				"localLocation": "unsorted/000.png",
-				"destination": "unsorted/p/"
+				"destination": "p/"
 			},
 			{
 				"localLocation": "unsorted/fileDoesntExist.parchment",
-				"destination": "unsorted/np/"
+				"destination": "np/"
 			},
 			{
 				"localLocation": "unsorted/111.png",
-				"destination": "../"
+				"destination": "newFolder/"
 			},
 		],
 		"fileRequests":[
@@ -37,10 +37,10 @@ header("Cache-Control: no-cache");
 	<json>
 	{
 		"sortResults":{
-			"filesMoved": 1,
+			"filesMoved": 2,
 			"errors": 1,
-			"warnings": 1,
-			"messages": "ERROR: file not found\nWARN: invalid destination"
+			"warnings": 0,
+			"messages": "ERROR: file not found\n"
 		},
 		"requestResponse":[
 			{
@@ -70,7 +70,6 @@ header("Cache-Control: no-cache");
 */
 #setup database, folder locations, and file list
 include('../../serviceConfig.php');
-$db = mysqli_connect($dbConfig['host'],$dbConfig['username'],$dbConfig['password'],$dbConfig['dbname']);
 
 
 #unpack json POST
@@ -79,7 +78,34 @@ $postJsonData = json_decode(file_get_contents("php://input"),true);
 $responseJsonData = [];
 
 if($postJsonData["fileSorting"]){
-	#TODO
+	//the database is only used if we need to do file sorting
+	$db = mysqli_connect($dbConfig['host'],$dbConfig['username'],$dbConfig['password'],$dbConfig['dbname']);
+	$sqlData = array("localLocation" => "","sha512" => "");
+	$dbUpdateLocation = mysqli_prepare($db, "UPDATE `".$dbConfig['tbname']."` SET `local_location`=? WHERE `sha512`=UNHEX(?)");
+	mysqli_stmt_bind_param($dbUpdateLocation, "ss", $sqlData["localLocation"], $sqlData["sha512"]);
+	$sortingResponse = array(
+		"moved" => 0,
+		"errors" => 0,
+		"warnings" => 0,
+		"messages" => ""
+	);
+	foreach($postJsonData["fileSorting"] as $fileSorting){
+		$directory = $_SERVER['DOCUMENT_ROOT'].dirname($fileSorting["localLocation"])."/".$fileSorting["destination"];
+		if(!is_dir($directory)){mkdir($directory);}
+		$newLocation = $directory."/".pathinfo($fileSorting["localLocation"], PATHINFO_BASENAME);
+		if(rename($_SERVER['DOCUMENT_ROOT'].$fileSorting["localLocation"], $newLocation)){
+			//file move worked. update database
+			$sqlData["localLocation"]=$newLocation;
+			$sqlData["sha512"]=hash_file("sha512",$newLocation);
+			mysqli_stmt_execute($dbUpdateLocation);
+			$sortingResponse["moved"]+=1;
+			#$sortingResponse["messages"].=$newLocation."\n";
+		}else{
+			#$sortingResponse["messages"].="";
+			$sortingResponse["warning"]+=1;
+		}
+	}
+	$responseJsonData["sortResults"] = $sortingResponse;
 }
 if($postJsonData["fileRequests"]){
 	$requestResponse = array();
